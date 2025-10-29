@@ -1,5 +1,5 @@
 {
-  "name": "my-app",
+  "name": "unmasked",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -9,7 +9,8 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.4",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "zustand": "^5.0.8"
   },
   "scripts": {
     "start": "react-scripts start",
