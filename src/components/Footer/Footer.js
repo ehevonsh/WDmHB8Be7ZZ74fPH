@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 
-import { getStrapiContent } from "../../lib/strapi";
+import { getStaticStrapiContent } from "../../lib/strapi";
 
 const Footer = () => {
   const [CMSContent, setCMSContent] = useState(null);
 
   useEffect(() => {
     let alive = true;
-    getStrapiContent("Footer")
+    getStaticStrapiContent("Footer")
       .then((data) => alive && setCMSContent(data))
       .catch(console.error);
     return () => {

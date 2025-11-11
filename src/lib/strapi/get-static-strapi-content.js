@@ -1,9 +1,9 @@
 import getStrapiUrl from "./get-strapi-url";
-import strapiQuerys from "./strapi-querys";
+import strapiQuerys from "./static-content-strapi-querys";
 
 const STRAPI_URL = getStrapiUrl();
 
-const getStrapiContent = async (contentType) => {
+const getStaticStrapiContent = async (contentType) => {
   const contentRes = await fetch(`${STRAPI_URL}/graphql`, {
     method: "POST",
     headers: {
@@ -28,4 +28,4 @@ const getStrapiContent = async (contentType) => {
   ];
 };
 
-export default getStrapiContent;
+export default getStaticStrapiContent;

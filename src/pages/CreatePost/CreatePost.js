@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 
 import { useAuth } from "../../lib/auth";
-import { getStrapiContent, createPost } from "../../lib/strapi";
+import { getStaticStrapiContent, createPost } from "../../lib/strapi";
 
 import RichTextBlocksInput from "./RichTextBlocksInput/RichTextBlocksInput";
 
@@ -16,7 +16,7 @@ const CreatePost = () => {
 
   useEffect(() => {
     let alive = true;
-    getStrapiContent("CreateAPostPage")
+    getStaticStrapiContent("CreateAPostPage")
       .then((data) => alive && setCMSContent(data))
       .catch(console.error);
     return () => {
@@ -32,7 +32,6 @@ const CreatePost = () => {
       richTextBlocksContent: contentBlocks,
       browserDataCombinationID: user?.browserDataCombinationID,
     });
-    console.log("Post creation result:", result);
 
     setPostCreationStatus(result);
     setTitle("");

@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useState, useEffect } from "react";
 
-import { getStrapiContent, getStrapiUrl } from "../../lib/strapi";
+import { getStaticStrapiContent, getStrapiUrl } from "../../lib/strapi";
 import { useAuth } from "../../lib/auth";
 import RegisterModal from "../../UI-components/RegisterModal/RegisterModal.js";
 import LogOutModal from "../../UI-components/LogOutModal/LogOutModal.js";
@@ -28,7 +28,7 @@ const Navbar = () => {
 
   useEffect(() => {
     let alive = true;
-    getStrapiContent("Navbar")
+    getStaticStrapiContent("Navbar")
       .then((data) => alive && setCMSContent(data))
       .catch(console.error);
     return () => {
@@ -62,6 +62,7 @@ const Navbar = () => {
             src={`${STRAPI_URL}${CMSContent.Logo.url}`}
             alt="Logo"
             className="w-12 h-12 rounded-full"
+            fetchPriority="high"
           />
         </NavLink>
         <nav className="flex gap-3 items-center">

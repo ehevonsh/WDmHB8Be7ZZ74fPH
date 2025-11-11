@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { BlocksRenderer } from "@strapi/blocks-react-renderer";
 
-import { getStrapiContent } from "../../lib/strapi";
+import { getStaticStrapiContent } from "../../lib/strapi";
 
 const AboutUs = () => {
   const [CMSContent, setCMSContent] = useState(null);
 
   useEffect(() => {
     let alive = true;
-    getStrapiContent("AboutUsPage")
+    getStaticStrapiContent("AboutUsPage")
       .then((data) => alive && setCMSContent(data))
       .catch(console.error);
     return () => {

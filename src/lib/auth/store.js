@@ -49,7 +49,6 @@ const useAuth = create((set, get) => ({
     try {
       const browserDataCombinationID = await collectPrivateSignals();
       const platformUser = await getPlatformUser(browserDataCombinationID);
-      console.log(platformUser)
       if (!platformUser) {
         set({
           status: "idle",

@@ -1,31 +1,23 @@
 import { useState, useEffect } from "react";
-
-import { useAuth } from "../../lib/auth";
-import { getStrapiContent } from "../../lib/strapi";
 import { NavLink } from "react-router-dom";
 
-//TODO: PostCard should be a seperate UI-component, which should also be usable by other pages (e.g. Users), pass down inner content as children
-const PostCard = ({
-  title,
-  author = "BEMMIMEES",
-  date = "23 November 1929",
-}) => (
-  <article className="bg-white rounded-xl shadow-md border border-zinc-200 p-4">
-    <h3 className="text-lg font-semibold mb-2">{title}</h3>
-    <p className="m-0 text-purple-600 font-semibold">
-      Posted by: <span className="text-purple-600">{author}</span>, {date}
-    </p>
-  </article>
-);
+import { useAuth } from "../../lib/auth";
+import { getStaticStrapiContent, getPosts } from "../../lib/strapi";
+import { getDateByUnixTime } from "../../lib/other-utils";
 
+import { PaginationNavbar, UserPostCard } from "../../UI-components";
+
+const PAGE_SIZE = 10;
 const Posts = () => {
   const authUser = useAuth((state) => state.user);
 
   const [CMSContent, setCMSContent] = useState(null);
+  const [postsData, setPostsData] = useState([]);
+  const [paginationIndex, setPaginationIndex] = useState(1);
 
   useEffect(() => {
     let alive = true;
-    getStrapiContent("Homepage")
+    getStaticStrapiContent("Homepage")
       .then((data) => alive && setCMSContent(data))
       .catch(console.error);
     return () => {
@@ -33,7 +25,19 @@ const Posts = () => {
     };
   }, []);
 
-  const items = new Array(5).fill("Post title, today I touched grass, almost");
+  useEffect(() => {
+    let alive = true;
+    getPosts({ page: paginationIndex, pageSize: PAGE_SIZE })
+      .then((res) => alive && setPostsData(res))
+      .catch(console.error);
+    return () => {
+      alive = false;
+    };
+  }, [paginationIndex]);
+
+  const setNewPaginationIndex = (newIndex) => () => {
+    setPaginationIndex(newIndex);
+  };
 
   if (!CMSContent) return null;
   return (
@@ -53,23 +57,34 @@ const Posts = () => {
             </NavLink>
           )}
         </div>
+        {postsData.success === true ? (
+          <div>
+            <div className="grid gap-4">
+              {postsData.data.posts.map((post, i) => (
+                <UserPostCard key={i}>
+                  <h3 className="text-xl font-semibold mb-2">{post.Title}</h3>
+                  <p className="m-0 text-purple font-semibold">
+                    Posted by:{" "}
+                    <span className="text-purple">
+                      {post.platform_user.Username}
+                    </span>
+                    , {getDateByUnixTime(post.UnixTime)}
+                  </p>
+                </UserPostCard>
+              ))}
+            </div>
 
-        <div className="grid gap-4">
-          {items.map((t, i) => (
-            <PostCard key={i} title={t} />
-          ))}
-        </div>
-
-        {/* TODO: actually use the pagination navbar to navigate through paginated posts */}
-        <div className="mt-6 flex justify-center gap-3">
-          <button
-            onClick={() => alert("Page 1 (stub)")}
-            className="px-3 py-1 text-white rounded-lg shadow font-bold bg-purple"
-          >
-            1
-          </button>
-          <span>{CMSContent.pagination_navbar.NextPageText}</span>
-        </div>
+            <PaginationNavbar
+              currentPage={paginationIndex}
+              totalItems={postsData?.data?.total || 0}
+              itemsPerPage={PAGE_SIZE}
+              CMSContent={CMSContent.pagination_navbar}
+              setNewPaginationIndex={setNewPaginationIndex}
+            />
+          </div>
+        ) : (
+          <p>{postsData.error}</p>
+        )}
       </section>
     </main>
   );
