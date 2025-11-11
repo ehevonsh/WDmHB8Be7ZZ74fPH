@@ -1,32 +1,36 @@
-/* 
-path: /secure/posts 
+import getStrapiUrl from "./get-strapi-url";
+import { getUnixTime } from "../other-utils";
 
-the endpoint resolver:
-module.exports = createCoreController('api::post.post', ({ strapi }) => ({
-  // Custom secure create using the private field on PlatformUser
-  async secureCreate(ctx) {
-    const payload = ctx.request.body?.data || ctx.request.body || {};
-    const { browserDataCombinationID, post } = payload;
+const createPost = async ({
+  title,
+  richTextBlocksContent,
+  browserDataCombinationID,
+}) => {
+  if (!browserDataCombinationID || !title || !richTextBlocksContent)
+    return { success: false, error: "Missing required fields" };
 
-    if (!browserDataCombinationID || !post) {
-      return ctx.badRequest('browserDataCombinationID and post are required.');
-    }
+  try {
+    const unixTime = getUnixTime();
+    const STRAPI_URL = getStrapiUrl();
 
-    // Find PlatformUser by private field (server-side filtering is allowed)
-    const platformUser = await strapi.db
-      .query('api::platform-user.platform-user')
-      .findOne({ where: { BrowserDataCombinationID: browserDataCombinationID } });
-
-    if (!platformUser) return ctx.unauthorized('Invalid BrowserDataCombinationID.');
-
-    // Create Post linked to that PlatformUser
-    const created = await strapi.entityService.create('api::post.post', {
-      data: { ...post, platform_user: platformUser.id },
+    const res = await fetch(`${STRAPI_URL}/api/secure/posts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        browserDataCombinationID,
+        post: {
+          Title: title,
+          Content: richTextBlocksContent,
+          UnixTime: unixTime,
+        },
+      }),
     });
+    if (!res.ok) throw new Error("Failed to create post");
 
-    ctx.body = created;
-  },
-}));
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e.message || "Unknown error" };
+  }
+};
 
-get the browserDataCombinationID from the auth store
-*/
+export default createPost;

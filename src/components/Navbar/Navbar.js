@@ -1,17 +1,24 @@
 import { NavLink } from "react-router-dom";
 import { useState, useEffect } from "react";
 
+import { getStrapiContent, getStrapiUrl } from "../../lib/strapi";
 import { useAuth } from "../../lib/auth";
+import RegisterModal from "../../UI-components/RegisterModal/RegisterModal.js";
+import LogOutModal from "../../UI-components/LogOutModal/LogOutModal.js";
 
 const linkBase = "px-3 py-2 rounded-lg text-sm font-medium transition";
 const linkInactive = "text-white hover:text-white hover:bg-gray";
+
 const Navbar = () => {
   const status = useAuth((s) => s.status);
   const createAccount = useAuth((s) => s.createAccount);
   const logOut = useAuth((s) => s.logOut);
   const logIn = useAuth((s) => s.hydrate);
 
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showLogOutModal, setShowLogOutModal] = useState(false);
   const [hasChosenToLogOut, setHasChosenToLogOut] = useState(false);
+  const [CMSContent, setCMSContent] = useState(null);
 
   useEffect(() => {
     setHasChosenToLogOut(
@@ -19,57 +26,99 @@ const Navbar = () => {
     );
   }, [hasChosenToLogOut, status]);
 
+  useEffect(() => {
+    let alive = true;
+    getStrapiContent("Navbar")
+      .then((data) => alive && setCMSContent(data))
+      .catch(console.error);
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const STRAPI_URL = getStrapiUrl();
+
+  // Handlers for modals
+  const handleRegister = (username) => {
+    // The modal now passes the username
+    if (username) {
+      console.log(username);
+      createAccount(username);
+      setShowRegisterModal(false);
+    }
+  };
+
+  const handleLogOut = () => {
+    logOut();
+    setShowLogOutModal(false);
+  };
+
+  if (!CMSContent) return null;
   return (
-    <header className="bg-black border-b border-dashed border-purple-400/50">
-      <div className="max-w-5xl mx-auto px-5 py-3 grid grid-cols-[auto,1fr,auto] items-center gap-6">
+    <header className="bg-black">
+      <div className="gridBox py-3 grid grid-cols-[auto,1fr,auto] items-center gap-6">
         <NavLink to="/" end className="flex items-center gap-2 text-white">
-          <img src="/logo192.png" alt="Logo" className="w-9 h-9 rounded-full" />
+          <img
+            src={`${STRAPI_URL}${CMSContent.Logo.url}`}
+            alt="Logo"
+            className="w-12 h-12 rounded-full"
+          />
         </NavLink>
         <nav className="flex gap-3 items-center">
-          <NavLink to="/about-us" end className={`${linkBase} ${linkInactive}`}>
-            About us
-          </NavLink>
-          <NavLink className={`${linkBase} ${linkInactive}`} to="/">
-            Posts
-          </NavLink>
-          <NavLink to="/about-us" end className={`${linkBase} ${linkInactive}`}>
-            My profile
-          </NavLink>
-          <NavLink
-            to="/about-us"
-            end
-            onClick={(e) => e.preventDefault()}
-            className={`${linkBase} ${linkInactive}`}
-          >
-            Users
-          </NavLink>
+          {CMSContent.NavigationMenu.map((link, i) => (
+            <NavLink
+              key={i}
+              to={link.LinkUrl}
+              end
+              className={`${linkBase} ${linkInactive}`}
+            >
+              {link.Text}
+            </NavLink>
+          ))}
         </nav>
-        {/* // TODO: in the future move the creating acccount functionality under the registering modal, keep the others */}
+
         {(status === "idle" || status === "error") && !hasChosenToLogOut && (
           <button
-            onClick={() => createAccount("newuser")}
+            onClick={() => setShowRegisterModal(true)} // Open modal
             className="bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px"
           >
-            Register
+            {CMSContent.RegisterButtonText}
           </button>
         )}
+
         {status === "loggedIn" && !hasChosenToLogOut && (
           <button
-            onClick={() => logOut()}
+            onClick={() => setShowLogOutModal(true)} // Open modal
             className="bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px"
           >
-            Log out
+            {CMSContent.LogOutButtonText}
           </button>
         )}
+
         {status === "anonymous" && hasChosenToLogOut && (
           <button
             onClick={() => logIn(true)}
             className="bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px"
           >
-            Log in
+            {CMSContent.SignInButtonText}
           </button>
         )}
       </div>
+
+      <RegisterModal
+        isOpen={showRegisterModal}
+        onClose={() => setShowRegisterModal(false)}
+        onRegister={handleRegister}
+        buttonText={CMSContent.RegisterButtonText}
+        bodyText="We will generate You an account based off Your browsers data. By registering You grant us permission to analyze Your browser. In the future the site will automatically log You in."
+      />
+
+      <LogOutModal
+        isOpen={showLogOutModal}
+        // onClose={() => setShowLogOutModal(false)}
+        onLogOut={handleLogOut}
+        buttonText={CMSContent.LogOutButtonText}
+      />
     </header>
   );
 };

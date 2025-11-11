@@ -4,10 +4,12 @@ import { useEffect } from "react";
 import { useAuth } from "./lib/auth";
 
 import { Navbar, Footer } from "./components";
-import { AboutUs, Posts } from "./pages";
+import { AboutUs, Posts, Users, Profile } from "./pages";
+import CreatePost from "./pages/CreatePost/CreatePost";
 
 function App() {
   const hydrateAuth = useAuth((state) => state.hydrate);
+  const user = useAuth((state) => state.user);
 
   useEffect(() => {
     hydrateAuth();
@@ -21,6 +23,11 @@ function App() {
           <Routes>
             <Route path="/" element={<Posts />} />
             <Route path="/about-us" element={<AboutUs />} />
+            {user.browserDataCombinationID && (
+              <Route path="/create-a-post" element={<CreatePost />} />
+            )}
+            <Route path="/users" element={<Users />} />
+            <Route path="/my-profile" element={<Profile />} />
             {/* Redirect helpers */}
             <Route path="/home" element={<Navigate to="/" replace />} />
             <Route path="*" element={<Navigate to="/" replace />} />
