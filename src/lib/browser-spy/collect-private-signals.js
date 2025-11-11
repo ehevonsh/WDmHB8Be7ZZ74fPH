@@ -5,7 +5,8 @@ async function collectPrivateSignals() {
   const time = Math.round(new Date().getMinutes() / 1) * 1;
   const screen_resolution = window.screen.availHeight + 'x' + window.screen.availWidth;
   const cores = navigator.hardwareConcurrency;
-  const storage = Math.round((await navigator.storage.estimate()).quota / 100000000); // incognito measures are unreliable and overtime change needs to be accounted for (likely means automatically updating it as well)
+  const storage = 10
+//  const storage = Math.round((await navigator.storage.estimate()).quota / 100000000); // incognito measures are unreliable and overtime change needs to be accounted for (likely means automatically updating it as well)
   const language = navigator.language;
   const useragent = navigator.userAgent;
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
