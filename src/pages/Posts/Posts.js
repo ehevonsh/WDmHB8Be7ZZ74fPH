@@ -58,7 +58,7 @@ const Posts = () => {
           )}
         </div>
         {postsData.success === true ? (
-          <div>
+          <>
             <div className="grid gap-4">
               {postsData.data.posts.map((post, i) => (
                 <UserPostCard key={i}>
@@ -81,7 +81,7 @@ const Posts = () => {
               CMSContent={CMSContent.pagination_navbar}
               setNewPaginationIndex={setNewPaginationIndex}
             />
-          </div>
+          </>
         ) : (
           <p>{postsData.error}</p>
         )}

@@ -1,50 +1,78 @@
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 
+import { PaginationNavbar, UserPostCard } from "../../UI-components";
+
+import { getStaticStrapiContent, getPlatformUsers } from "../../lib/strapi";
+import { getDateByUnixTime } from "../../lib/other-utils";
+
+const PAGE_SIZE = 10;
 const Users = () => {
-  // TODO: Replace with Strapi GET /api/users (or your collection type)
-  const users = useMemo(
-    () => [
-      { id: 1, name: "BEMMIMEES" },
-      { id: 2, name: "PURUPUDI" },
-      { id: 3, name: "TURUTUVI" },
-      { id: 4, name: "OHULÄVEND" },
-      { id: 5, name: "GETOVEND" },
-    ],
-    []
-  );
+  const [CMSContent, setCMSContent] = useState(null);
+  const [platformUsers, setPlatformUsers] = useState([]);
+  const [paginationIndex, setPaginationIndex] = useState(1);
 
-  const summary =
-    "Browser: Firefox 143 (Linux x86_64), Screen: 1920×995; Time Zone UTC+0; Hardware: 4 cores, 8 GB RAM, GTX 970; Fingerprint: Canvas & WebGL randomized; Fonts: common; Language: en-US";
+  useEffect(() => {
+    let alive = true;
+    getStaticStrapiContent("UsersPage")
+      .then((data) => alive && setCMSContent(data))
+      .catch(console.error);
+    return () => {
+      alive = false;
+    };
+  }, []);
 
+  useEffect(() => {
+    let alive = true;
+    getPlatformUsers({ page: paginationIndex, pageSize: PAGE_SIZE })
+      .then((res) => alive && setPlatformUsers(res))
+      .catch(console.error);
+    return () => {
+      alive = false;
+    };
+  }, [paginationIndex]);
+
+  const setNewPaginationIndex = (newIndex) => () => {
+    setPaginationIndex(newIndex);
+  };
+
+  if (!CMSContent) return null;
   return (
     <main className="gridBox mt-6">
       <section>
-        <h1 className="text-2xl font-bold mb-4 text-black">Users</h1>
+        <h1 className="text-2xl font-bold mb-4 text-black">
+          {CMSContent.PageHeader}
+        </h1>
 
-        <ul className="grid gap-4">
-          {users.map((u) => (
-            <li
-              key={u.id}
-              className="bg-white rounded-xl shadow-md border border-zinc-200 p-4"
-            >
-              <span className="text-purple-600 font-semibold hover:underline">
-                {u.name}
-              </span>
-              <p className="text-sm text-zinc-600 mt-1">{summary}</p>
-            </li>
-          ))}
-        </ul>
+        {platformUsers.success === true ? (
+          <>
+            <div className="grid gap-4">
+              {platformUsers.data.platformUsers.map((platformUser, i) => (
+                <UserPostCard key={`user-${i}`}>
+                  <h3 className="text-purple font-semibold hover:underline">
+                    {platformUser.Username}
+                  </h3>
+                  <p className="text-sm text-black mt-1">
+                    {platformUser.UserDataToDisplayToOthers}
+                  </p>
+                  <p className="text-sm text-gray mt-1">
+                    Joined at:{" "}
+                    {getDateByUnixTime(platformUser.JoinedAtUnixTime)}
+                  </p>
+                </UserPostCard>
+              ))}
+            </div>
 
-        {/* Pagination stub */}
-        <div className="mt-6 flex justify-center gap-3">
-          <button
-            onClick={() => alert("Page 1 (stub)")}
-            className="px-3 py-1 text-white rounded-lg shadow font-bold bg-purple"
-          >
-            1
-          </button>
-          <span>Next page</span>
-        </div>
+            <PaginationNavbar
+              currentPage={paginationIndex}
+              totalItems={platformUsers?.data?.total || 0}
+              itemsPerPage={PAGE_SIZE}
+              CMSContent={CMSContent.pagination_navbar}
+              setNewPaginationIndex={setNewPaginationIndex}
+            />
+          </>
+        ) : (
+          <p>{platformUsers.error}</p>
+        )}
       </section>
     </main>
   );

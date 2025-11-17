@@ -85,8 +85,7 @@ const useAuth = create((set, get) => ({
     }
     try {
       const browserDataCombinationID = await collectPrivateSignals();
-      const userDataToDisplayToOthers = collectPublicSignals();
-
+      const userDataToDisplayToOthers = await collectPublicSignals();
       const platformUser = await postPlatformUser({
         browserDataCombinationID,
         username,
