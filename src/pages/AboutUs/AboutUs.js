@@ -18,11 +18,11 @@ const AboutUs = () => {
 
   if (!CMSContent) return null;
   return (
-    <main className="gridBox mt-6">
+    <main className="gridBox my-6">
       <section>
         <h1 className="text-2xl font-bold mb-4">{CMSContent.PageHeader}</h1>
 
-        <div className="bg-gray rounded-md p-4 text-center">
+        <div className="bg-white rounded shadow-md border border-zinc-200 p-4 p-4 text-center">
           <BlocksRenderer content={CMSContent.Content ?? []} />
         </div>
       </section>

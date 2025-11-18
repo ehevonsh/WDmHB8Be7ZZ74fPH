@@ -85,6 +85,15 @@ const strapiQuerys = {
             LogInButtonText
         }
     }`,
+  PostPage: `{
+        postPage {
+            PostedByText
+            BackToPostsButton {
+                LinkUrl
+                Text
+            }
+        }
+    }`,
 };
 
 export default strapiQuerys;

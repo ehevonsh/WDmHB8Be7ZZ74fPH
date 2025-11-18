@@ -19,6 +19,7 @@ const getPosts = async ({ page, pageSize }) => {
       body: JSON.stringify({
         query: `{
             posts(pagination: { page: ${page}, pageSize: ${pageSize} }, sort: "UnixTime:desc") {
+              documentId
               Title
               UnixTime
               platform_user {
@@ -62,9 +63,7 @@ const getPostsByUsername = async ({ username, page, pageSize }) => {
     pageSize === null ||
     pageSize === undefined
   )
-    throw new Error(
-      "Missing required parameters: username, page, or pageSize"
-    );
+    throw new Error("Missing required parameters: username, page, or pageSize");
 
   try {
     // 1. Fetch paginated posts for the user via GraphQL
@@ -79,6 +78,7 @@ const getPostsByUsername = async ({ username, page, pageSize }) => {
               filters: { platform_user: { Username: { eq: "${username}" } } },
               sort: "UnixTime:desc"
             ) {
+              documentId
               Title
               UnixTime
               platform_user {
@@ -145,5 +145,39 @@ const createPost = async ({
   }
 };
 
-// Export the new function alongside the existing ones
-export { createPost, getPosts, getPostsByUsername };
+const getPostByDocumentId = async (documentId) => {
+  if (!documentId)
+    return { success: false, data: null, error: "Missing documentId" };
+  try {
+    const getPostRes = await fetch(`${STRAPI_URL}/graphql`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: `{
+            post(documentId: "${documentId}") {
+              documentId
+              Title
+              Content
+              UnixTime
+              platform_user {
+                Username
+              }
+            }
+          }`,
+      }),
+    });
+    if (!getPostRes.ok) throw new Error("Failed to fetch post");
+
+    const getPostData = await getPostRes.json();
+
+    return {
+      success: true,
+      data: getPostData.data.post,
+      error: null,
+    };
+  } catch (e) {
+    return { success: false, data: null, error: e.message || "Unknown error" };
+  }
+};
+
+export { createPost, getPosts, getPostByDocumentId, getPostsByUsername };

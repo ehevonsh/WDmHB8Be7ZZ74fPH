@@ -58,6 +58,29 @@ const postPlatformUser = async ({
   }
 };
 
+const updatePlatformUser = async ({
+  browserDataCombinationID,
+  userDataToDisplayToOthers,
+}) => {
+  try {
+    const res = await fetch(`${STRAPI_URL}/api/secure/platform-users/update`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        browserDataCombinationID,
+        userDataToDisplayToOthers,
+      }),
+    });
+    const result = await res.json();
+
+    if (result.error) return null;
+    return result;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
 const getPlatformUsers = async ({ page, pageSize }) => {
   if (
     page === null ||
@@ -104,4 +127,4 @@ const getPlatformUsers = async ({ page, pageSize }) => {
   }
 };
 
-export { getPlatformUser, postPlatformUser, getPlatformUsers };
+export { getPlatformUser, postPlatformUser, getPlatformUsers, updatePlatformUser };

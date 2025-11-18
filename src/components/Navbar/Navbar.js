@@ -18,6 +18,7 @@ const Navbar = () => {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showLogOutModal, setShowLogOutModal] = useState(false);
   const [hasChosenToLogOut, setHasChosenToLogOut] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [CMSContent, setCMSContent] = useState(null);
 
   useEffect(() => {
@@ -51,21 +52,72 @@ const Navbar = () => {
   const handleLogOut = () => {
     logOut();
     setShowLogOutModal(false);
+    setIsMenuOpen(false);
+  };
+
+  const handleLinkClick = () => setIsMenuOpen(false);
+
+  const renderAuthButtons = (extraClasses = "") => {
+    if ((status === "idle" || status === "error") && !hasChosenToLogOut) {
+      return (
+        <button
+          onClick={() => setShowRegisterModal(true)} // Open modal
+          className={`bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px ${extraClasses}`}
+        >
+          {CMSContent.RegisterButtonText}
+        </button>
+      );
+    }
+
+    if (status === "loggedIn" && !hasChosenToLogOut) {
+      return (
+        <button
+          onClick={() => setShowLogOutModal(true)} // Open modal
+          className={`bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px ${extraClasses}`}
+        >
+          {CMSContent.LogOutButtonText}
+        </button>
+      );
+    }
+
+    if (status === "anonymous" && hasChosenToLogOut) {
+      return (
+        <button
+          onClick={() => logIn(true)}
+          className={`bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px ${extraClasses}`}
+        >
+          {CMSContent.SignInButtonText}
+        </button>
+      );
+    }
+    return null;
   };
 
   if (!CMSContent) return null;
   return (
     <header className="bg-black">
-      <div className="gridBox py-3 grid grid-cols-[auto,1fr,auto] items-center gap-6">
-        <NavLink to="/" end className="flex items-center gap-2 text-white">
-          <img
-            src={`${STRAPI_URL}${CMSContent.Logo.url}`}
-            alt="Logo"
-            className="w-12 h-12 rounded-full"
-            fetchPriority="high"
-          />
-        </NavLink>
-        <nav className="flex gap-3 items-center">
+      <div className="gridBox py-3 flex flex-wrap items-center gap-4">
+        <div className="flex items-center gap-3">
+          <NavLink to="/" end className="flex items-center gap-2 text-white">
+            <img
+              src={`${STRAPI_URL}${CMSContent.Logo.url}`}
+              alt="Logo"
+              className="w-12 h-12 rounded-full"
+              fetchPriority="high"
+            />
+          </NavLink>
+          <button
+            type="button"
+            className="text-white border border-white/50 rounded px-3 py-2 text-sm md:hidden"
+            onClick={() => setIsMenuOpen((prev) => !prev)}
+            aria-expanded={isMenuOpen}
+            aria-label="Toggle navigation menu"
+          >
+            {isMenuOpen ? "Close" : "Menu"}
+          </button>
+        </div>
+
+        <nav className="hidden md:flex gap-3 items-center flex-1">
           {CMSContent.NavigationMenu.map((link, i) => (
             <NavLink
               key={i}
@@ -78,31 +130,29 @@ const Navbar = () => {
           ))}
         </nav>
 
-        {(status === "idle" || status === "error") && !hasChosenToLogOut && (
-          <button
-            onClick={() => setShowRegisterModal(true)} // Open modal
-            className="bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px"
-          >
-            {CMSContent.RegisterButtonText}
-          </button>
-        )}
+        <div className="hidden md:flex items-center gap-3">
+          {renderAuthButtons()}
+        </div>
 
-        {status === "loggedIn" && !hasChosenToLogOut && (
-          <button
-            onClick={() => setShowLogOutModal(true)} // Open modal
-            className="bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px"
-          >
-            {CMSContent.LogOutButtonText}
-          </button>
-        )}
-
-        {status === "anonymous" && hasChosenToLogOut && (
-          <button
-            onClick={() => logIn(true)}
-            className="bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px"
-          >
-            {CMSContent.SignInButtonText}
-          </button>
+        {isMenuOpen && (
+          <div className="w-full flex flex-col gap-3 md:hidden">
+            <nav className="flex flex-col gap-2">
+              {CMSContent.NavigationMenu.map((link, i) => (
+                <NavLink
+                  key={i}
+                  to={link.LinkUrl}
+                  end
+                  onClick={handleLinkClick}
+                  className={`${linkBase} ${linkInactive} w-full text-left`}
+                >
+                  {link.Text}
+                </NavLink>
+              ))}
+            </nav>
+            <div className="flex flex-col gap-2">
+              {renderAuthButtons("w-full text-center")}
+            </div>
+          </div>
         )}
       </div>
 
@@ -116,7 +166,7 @@ const Navbar = () => {
 
       <LogOutModal
         isOpen={showLogOutModal}
-        // onClose={() => setShowLogOutModal(false)}
+        onClose={() => setShowLogOutModal(false)}
         onLogOut={handleLogOut}
         buttonText={CMSContent.LogOutButtonText}
       />

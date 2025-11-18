@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useAuth } from "./lib/auth";
 
 import { Navbar, Footer } from "./components";
-import { AboutUs, Posts, Users, Profile } from "./pages";
+import { AboutUs, Posts, Users, Profile, PostPage } from "./pages";
 import CreatePost from "./pages/CreatePost/CreatePost";
 
 function App() {
@@ -22,6 +22,7 @@ function App() {
           <Navbar />
           <Routes>
             <Route path="/" element={<Posts />} />
+            <Route path="/post/:postDocumentId" element={<PostPage />} />
             <Route path="/about-us" element={<AboutUs />} />
             {user.browserDataCombinationID && (
               <Route path="/create-a-post" element={<CreatePost />} />

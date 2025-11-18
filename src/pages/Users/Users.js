@@ -37,11 +37,13 @@ const Users = () => {
 
   if (!CMSContent) return null;
   return (
-    <main className="gridBox mt-6">
+    <main className="gridBox my-6">
       <section>
-        <h1 className="text-2xl font-bold mb-4 text-black">
-          {CMSContent.PageHeader}
-        </h1>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+          <h1 className="text-2xl font-bold text-black">
+            {CMSContent.PageHeader}
+          </h1>
+        </div>
 
         {platformUsers.success === true ? (
           <>

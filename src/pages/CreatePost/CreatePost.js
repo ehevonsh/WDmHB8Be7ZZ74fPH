@@ -41,7 +41,7 @@ const CreatePost = () => {
   if (!CMSContent) return null;
   return (
     <main className="gridBox">
-      <section className="mt-6">
+      <section className="my-6">
         {!postCreationStatus && (
           <h1 className="text-2xl font-bold mb-4 text-black">
             {CMSContent.PageHeader}
@@ -77,18 +77,18 @@ const CreatePost = () => {
             </>
           )}
 
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             {!postCreationStatus && (
               <button
                 type="submit"
-                className="bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px"
+                className="bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px w-full sm:w-auto"
               >
                 {CMSContent.PostButtonText}
               </button>
             )}
             <NavLink
               to={CMSContent.BackToPostsButton.LinkUrl}
-              className="bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px"
+              className="bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px w-full sm:w-auto text-center"
             >
               {CMSContent.BackToPostsButton.Text}
             </NavLink>

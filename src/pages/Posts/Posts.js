@@ -41,15 +41,15 @@ const Posts = () => {
 
   if (!CMSContent) return null;
   return (
-    <main className="gridBox mt-6">
+    <main className="gridBox my-6">
       <section className="bg-white rounded-lg min-h-[60vh]">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
           <h1 className="text-2xl font-bold text-black">
             {CMSContent.PageHeader}
           </h1>
           {authUser.browserDataCombinationID && (
             <NavLink
-              className="bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px"
+              className="bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px w-full sm:w-auto text-center"
               to={CMSContent.AddAPostButton.LinkUrl}
               end
             >
@@ -61,16 +61,18 @@ const Posts = () => {
           <>
             <div className="grid gap-4">
               {postsData.data.posts.map((post, i) => (
-                <UserPostCard key={i}>
-                  <h3 className="text-xl font-semibold mb-2">{post.Title}</h3>
-                  <p className="m-0 text-purple font-semibold">
-                    Posted by:{" "}
-                    <span className="text-purple">
-                      {post.platform_user.Username}
-                    </span>
-                    , {getDateByUnixTime(post.UnixTime)}
-                  </p>
-                </UserPostCard>
+                <NavLink to={`/post/${post.documentId}`} key={i}>
+                  <UserPostCard>
+                    <h3 className="text-xl font-semibold mb-2">{post.Title}</h3>
+                    <p className="m-0 text-purple font-semibold">
+                      Posted by:{" "}
+                      <span className="text-purple">
+                        {post.platform_user.Username}
+                      </span>
+                      , {getDateByUnixTime(post.UnixTime)}
+                    </p>
+                  </UserPostCard>
+                </NavLink>
               ))}
             </div>
 
