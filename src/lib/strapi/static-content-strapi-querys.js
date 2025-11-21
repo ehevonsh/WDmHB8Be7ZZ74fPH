@@ -11,8 +11,9 @@ const strapiQuerys = {
                 ${imageQueryFormat}
             }
             NavigationMenu {
-            LinkUrl
-            Text
+                LinkUrl
+                Text
+                IsProtectedRoute
             }
             RegisterButtonText
             SignInButtonText

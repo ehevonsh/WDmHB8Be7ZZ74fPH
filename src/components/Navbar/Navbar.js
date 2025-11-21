@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import { getStaticStrapiContent, getStrapiUrl } from "../../lib/strapi";
@@ -14,12 +14,15 @@ const Navbar = () => {
   const createAccount = useAuth((s) => s.createAccount);
   const logOut = useAuth((s) => s.logOut);
   const logIn = useAuth((s) => s.hydrate);
+  const user = useAuth((s) => s.user);
 
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showLogOutModal, setShowLogOutModal] = useState(false);
   const [hasChosenToLogOut, setHasChosenToLogOut] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [CMSContent, setCMSContent] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     setHasChosenToLogOut(
@@ -43,7 +46,6 @@ const Navbar = () => {
   const handleRegister = (username) => {
     // The modal now passes the username
     if (username) {
-      console.log(username);
       createAccount(username);
       setShowRegisterModal(false);
     }
@@ -53,6 +55,12 @@ const Navbar = () => {
     logOut();
     setShowLogOutModal(false);
     setIsMenuOpen(false);
+    navigate(0);
+  };
+
+  const handleLogIn = () => {
+    logIn(true);
+    navigate(0);
   };
 
   const handleLinkClick = () => setIsMenuOpen(false);
@@ -83,7 +91,7 @@ const Navbar = () => {
     if (status === "anonymous" && hasChosenToLogOut) {
       return (
         <button
-          onClick={() => logIn(true)}
+          onClick={() => handleLogIn()}
           className={`bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px ${extraClasses}`}
         >
           {CMSContent.SignInButtonText}
@@ -92,12 +100,19 @@ const Navbar = () => {
     }
     return null;
   };
-
   if (!CMSContent) return null;
+
+  const navigationLinks = CMSContent.NavigationMenu.filter((link) =>
+    user.browserDataCombinationID === undefined &&
+    link.IsProtectedRoute === true
+      ? false
+      : true
+  );
+
   return (
     <header className="bg-black">
       <div className="gridBox py-3 flex flex-wrap items-center gap-4">
-        <div className="flex items-center gap-3">
+        <div className="w-full md:w-auto flex justify-between md:justify-start items-center gap-3">
           <NavLink to="/" end className="flex items-center gap-2 text-white">
             <img
               src={`${STRAPI_URL}${CMSContent.Logo.url}`}
@@ -108,17 +123,22 @@ const Navbar = () => {
           </NavLink>
           <button
             type="button"
-            className="text-white border border-white/50 rounded px-3 py-2 text-sm md:hidden"
+            className="md:hidden mx-2"
             onClick={() => setIsMenuOpen((prev) => !prev)}
             aria-expanded={isMenuOpen}
             aria-label="Toggle navigation menu"
           >
-            {isMenuOpen ? "Close" : "Menu"}
+            <img
+              src={`${STRAPI_URL}${CMSContent.BurgerMenuIcon.url}`}
+              alt={CMSContent.BurgerMenuIcon.alternativeText || "Menu"}
+              className="w-8 h-8"
+              fetchPriority="high"
+            />
           </button>
         </div>
 
         <nav className="hidden md:flex gap-3 items-center flex-1">
-          {CMSContent.NavigationMenu.map((link, i) => (
+          {navigationLinks.map((link, i) => (
             <NavLink
               key={i}
               to={link.LinkUrl}
@@ -137,17 +157,22 @@ const Navbar = () => {
         {isMenuOpen && (
           <div className="w-full flex flex-col gap-3 md:hidden">
             <nav className="flex flex-col gap-2">
-              {CMSContent.NavigationMenu.map((link, i) => (
-                <NavLink
-                  key={i}
-                  to={link.LinkUrl}
-                  end
-                  onClick={handleLinkClick}
-                  className={`${linkBase} ${linkInactive} w-full text-left`}
-                >
-                  {link.Text}
-                </NavLink>
-              ))}
+              {navigationLinks.map(
+                (link, i) => (
+                  /*  user.browserDataCombinationID === undefined &&
+                link.IsProtectedRoute === true ? null : ( */
+                  <NavLink
+                    key={i}
+                    to={link.LinkUrl}
+                    end
+                    onClick={handleLinkClick}
+                    className={`${linkBase} ${linkInactive} w-full text-left`}
+                  >
+                    {link.Text}
+                  </NavLink>
+                )
+                /*    ) */
+              )}
             </nav>
             <div className="flex flex-col gap-2">
               {renderAuthButtons("w-full text-center")}

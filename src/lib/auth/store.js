@@ -114,7 +114,6 @@ const useAuth = create((set, get) => ({
       });
     }
   },
-  // TODO: even if used is logged out, the hydrate function runs on rerender and the state is reset so they get logged in again automatically
   async logOut() {
     set({ user: defaultUser, status: "anonymous" });
     sessionStorage.setItem("hasChosenToLogOut", "true");
