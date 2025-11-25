@@ -82,8 +82,7 @@ const strapiQuerys = {
   LogOutModal: `{
         logOutModal {
             AreYouSureMessage
-            ConfirmationMessage
-            LogInButtonText
+            LogOutButtonText
         }
     }`,
   PostPage: `{

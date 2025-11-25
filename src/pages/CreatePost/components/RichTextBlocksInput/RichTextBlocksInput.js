@@ -23,6 +23,8 @@ const RichTextBlocksInput = ({ value, onChange }) => {
     <textarea
       rows={8}
       required
+      minLength={5}
+      maxLength={10000}
       className="w-full min-h-32 h-[50vh] rounded resize-y p-3 border border-zinc-300"
       value={toPlainText(value)}
       onChange={handleChange}

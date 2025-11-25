@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { BlocksRenderer } from "@strapi/blocks-react-renderer";
 
 import { getStaticStrapiContent } from "../../lib/strapi";
+import { NoStrapiData } from "../../UI-components";
 
 const AboutUs = () => {
   const [CMSContent, setCMSContent] = useState(null);
@@ -16,7 +17,9 @@ const AboutUs = () => {
     };
   }, []);
 
-  if (!CMSContent) return null;
+  if (!CMSContent) {
+    return <NoStrapiData />;
+  }
   return (
     <main className="gridBox my-6">
       <section>

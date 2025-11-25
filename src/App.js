@@ -11,8 +11,10 @@ import CreatePost from "./pages/CreatePost/CreatePost";
 function App() {
   const hydrateAuth = useAuth((state) => state.hydrate);
   const user = useAuth((state) => state.user);
+  const authStatus = useAuth((state) => state.status);
 
-  const isAuthenticated = user.browserDataCombinationID !== undefined;
+  const isAuthenticated =
+    user.browserDataCombinationID !== undefined && authStatus === "loggedIn";
 
   useEffect(() => {
     hydrateAuth();

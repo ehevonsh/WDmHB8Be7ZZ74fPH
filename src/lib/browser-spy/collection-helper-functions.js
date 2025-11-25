@@ -52,6 +52,7 @@ function get2dCanvasData() {
 
 function detectSpoofing() {
     // Randomization
+    // Detecting it in Brave would require client-side workers
     const data1 = get2dCanvasData();
     const data2 = get2dCanvasData();
     if (data1 !== data2) {

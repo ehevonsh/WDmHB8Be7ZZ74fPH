@@ -8,7 +8,7 @@ async function collectPublicSignals() {
     const useragent = navigator.userAgent;
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const gpu = getGPU();
-    let device_type = "Unknown"
+    let device_type = "Unknown" // this means ff or something old/uncommon
     if (navigator.getBattery) { // not in firefox
       const battery = (await navigator.getBattery());
       if ((battery.charging && battery.chargingTime === 0) || (!battery.charging && battery.dischargingTime === Infinity)) {

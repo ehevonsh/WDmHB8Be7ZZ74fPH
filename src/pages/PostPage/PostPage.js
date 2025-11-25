@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, NavLink } from "react-router-dom";
 
 import { getStaticStrapiContent, getPostByDocumentId } from "../../lib/strapi";
-import { UserPostCard } from "../../UI-components";
+import { NoStrapiData, UserPostCard } from "../../UI-components";
 import { BlocksRenderer } from "@strapi/blocks-react-renderer";
 
 const PostPage = () => {
@@ -30,20 +30,22 @@ const PostPage = () => {
     };
   }, [postDocumentId]);
 
-  if (!CMSContent) return null;
+  if (!CMSContent) {
+    return <NoStrapiData />;
+  }
   return (
     <main className="gridBox my-6">
       {postData?.success === true ? (
         <section>
           <h2 className="flex flex-col text-lg my-4">
             <span className="font-semibold">{CMSContent.PostedByText}</span>
-            <span className="text-purple">
+            <span className="text-purple max-w-1/3">
               {postData.data.platform_user.Username}
             </span>
           </h2>
           <UserPostCard>
             <h1 className="font-bold text-2xl mb-4">{postData.data.Title}</h1>
-            <div className="text-lg">
+            <div className="text-lg break-all max-w-full">
               <BlocksRenderer content={postData.data.Content || []} />
             </div>
           </UserPostCard>

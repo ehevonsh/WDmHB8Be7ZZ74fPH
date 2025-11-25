@@ -41,7 +41,11 @@ const getPosts = async ({ page, pageSize }) => {
     return {
       success: true,
       data: {
-        posts: getPostsData.data.posts,
+        posts: getPostsData.data.posts.filter(
+          (post) =>
+            post?.platform_user?.Username !== null ||
+            post?.platform_user?.Username !== undefined
+        ),
         total: getPostsAmountData.meta.pagination.total,
       },
       error: null,

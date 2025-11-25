@@ -4,7 +4,8 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../../lib/auth";
 import { getStaticStrapiContent, createPost } from "../../lib/strapi";
 
-import RichTextBlocksInput from "./RichTextBlocksInput/RichTextBlocksInput";
+import RichTextBlocksInput from "./components/RichTextBlocksInput/RichTextBlocksInput";
+import { NoStrapiData } from "../../UI-components";
 
 const CreatePost = () => {
   const user = useAuth((state) => state.user);
@@ -38,7 +39,9 @@ const CreatePost = () => {
     setContentBlocks([]);
   };
 
-  if (!CMSContent) return null;
+  if (!CMSContent) {
+    return <NoStrapiData />;
+  }
   return (
     <main className="gridBox">
       <section className="my-6">
@@ -65,6 +68,8 @@ const CreatePost = () => {
               <input
                 type="text"
                 placeholder="Title"
+                minLength={5}
+                maxLength={50}
                 className="w-full rounded border border-zinc-300 px-3 py-2"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -78,6 +83,12 @@ const CreatePost = () => {
           )}
 
           <div className="flex flex-col sm:flex-row gap-3">
+            <NavLink
+              to={CMSContent.BackToPostsButton.LinkUrl}
+              className="bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px w-full sm:w-auto text-center"
+            >
+              {CMSContent.BackToPostsButton.Text}
+            </NavLink>
             {!postCreationStatus && (
               <button
                 type="submit"
@@ -86,12 +97,6 @@ const CreatePost = () => {
                 {CMSContent.PostButtonText}
               </button>
             )}
-            <NavLink
-              to={CMSContent.BackToPostsButton.LinkUrl}
-              className="bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px w-full sm:w-auto text-center"
-            >
-              {CMSContent.BackToPostsButton.Text}
-            </NavLink>
           </div>
         </form>
       </section>

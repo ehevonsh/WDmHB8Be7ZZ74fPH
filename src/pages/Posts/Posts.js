@@ -5,7 +5,11 @@ import { useAuth } from "../../lib/auth";
 import { getStaticStrapiContent, getPosts } from "../../lib/strapi";
 import { getDateByUnixTime } from "../../lib/other-utils";
 
-import { PaginationNavbar, UserPostCard } from "../../UI-components";
+import {
+  NoStrapiData,
+  PaginationNavbar,
+  UserPostCard,
+} from "../../UI-components";
 
 const PAGE_SIZE = 10;
 const Posts = () => {
@@ -39,7 +43,10 @@ const Posts = () => {
     setPaginationIndex(newIndex);
   };
 
-  if (!CMSContent) return null;
+  if (!CMSContent) {
+    return <NoStrapiData />;
+  }
+
   return (
     <main className="gridBox my-6">
       <section className="bg-white rounded-lg min-h-[60vh]">
@@ -59,22 +66,28 @@ const Posts = () => {
         </div>
         {postsData.success === true ? (
           <>
-            <div className="grid gap-4">
-              {postsData.data.posts.map((post, i) => (
-                <NavLink to={`/post/${post.documentId}`} key={i}>
-                  <UserPostCard>
-                    <h3 className="text-xl font-semibold mb-2">{post.Title}</h3>
-                    <p className="m-0 text-purple font-semibold">
-                      Posted by:{" "}
-                      <span className="text-purple">
-                        {post.platform_user.Username}
-                      </span>
-                      , {getDateByUnixTime(post.UnixTime)}
-                    </p>
-                  </UserPostCard>
-                </NavLink>
-              ))}
-            </div>
+            {postsData.data.posts.length > 0 ? (
+              <div className="grid gap-4">
+                {postsData.data.posts.map((post, i) => (
+                  <NavLink to={`/post/${post.documentId}`} key={i}>
+                    <UserPostCard>
+                      <h3 className="text-xl font-semibold mb-2">
+                        {post.Title}
+                      </h3>
+                      <p className="m-0 text-purple font-semibold">
+                        Posted by:{" "}
+                        <span className="text-purple">
+                          {post.platform_user.Username}
+                        </span>
+                        , {getDateByUnixTime(post.UnixTime)}
+                      </p>
+                    </UserPostCard>
+                  </NavLink>
+                ))}
+              </div>
+            ) : (
+              <p>No posts were found</p>
+            )}
 
             <PaginationNavbar
               currentPage={paginationIndex}

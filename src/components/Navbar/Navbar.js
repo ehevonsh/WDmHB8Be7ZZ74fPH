@@ -5,6 +5,7 @@ import { getStaticStrapiContent, getStrapiUrl } from "../../lib/strapi";
 import { useAuth } from "../../lib/auth";
 import RegisterModal from "../../UI-components/RegisterModal/RegisterModal.js";
 import LogOutModal from "../../UI-components/LogOutModal/LogOutModal.js";
+import { NoStrapiData } from "../../UI-components/index.js";
 
 const linkBase = "px-3 py-2 rounded-lg text-sm font-medium transition";
 const linkInactive = "text-white hover:text-white hover:bg-gray";
@@ -100,7 +101,8 @@ const Navbar = () => {
     }
     return null;
   };
-  if (!CMSContent) return null;
+
+  if (!CMSContent) return <NoStrapiData />;
 
   const navigationLinks = CMSContent.NavigationMenu.filter((link) =>
     user.browserDataCombinationID === undefined &&
@@ -157,22 +159,17 @@ const Navbar = () => {
         {isMenuOpen && (
           <div className="w-full flex flex-col gap-3 md:hidden">
             <nav className="flex flex-col gap-2">
-              {navigationLinks.map(
-                (link, i) => (
-                  /*  user.browserDataCombinationID === undefined &&
-                link.IsProtectedRoute === true ? null : ( */
-                  <NavLink
-                    key={i}
-                    to={link.LinkUrl}
-                    end
-                    onClick={handleLinkClick}
-                    className={`${linkBase} ${linkInactive} w-full text-left`}
-                  >
-                    {link.Text}
-                  </NavLink>
-                )
-                /*    ) */
-              )}
+              {navigationLinks.map((link, i) => (
+                <NavLink
+                  key={i}
+                  to={link.LinkUrl}
+                  end
+                  onClick={handleLinkClick}
+                  className={`${linkBase} ${linkInactive} w-full text-left`}
+                >
+                  {link.Text}
+                </NavLink>
+              ))}
             </nav>
             <div className="flex flex-col gap-2">
               {renderAuthButtons("w-full text-center")}
@@ -185,8 +182,6 @@ const Navbar = () => {
         isOpen={showRegisterModal}
         onClose={() => setShowRegisterModal(false)}
         onRegister={handleRegister}
-        buttonText={CMSContent.RegisterButtonText}
-        bodyText="We will generate You an account based off Your browsers data. By registering You grant us permission to analyze Your browser. In the future the site will automatically log You in."
       />
 
       <LogOutModal

@@ -1,13 +1,34 @@
-import React from 'react';
-import Modal from '../Modal/Modal.js';
+import { useEffect, useState } from "react";
+
+import { getStaticStrapiContent } from "../../lib/strapi";
+
+import Modal from "../Modal/Modal.js";
+import NoStrapiData from "../NoStrapiData/NoStrapiData.js";
 
 const LogOutModal = ({ isOpen, onClose, onLogOut, buttonText }) => {
+  const [CMSContent, setCMSContent] = useState(null);
+
+  useEffect(() => {
+    let alive = true;
+    getStaticStrapiContent("LogOutModal")
+      .then((data) => alive && setCMSContent(data))
+      .catch(console.error);
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  if (!CMSContent) {
+    return (
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <NoStrapiData />
+      </Modal>
+    );
+  }
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <h2 className="text-2xl font-semibold mb-4 text-gray-800">Log Out</h2>
-      <p className="text-gray-600 mb-6">
-        Are you sure you want to log out?
-      </p>
+      <p className="text-gray-600 mb-6">{CMSContent.AreYouSureMessage}</p>
 
       <div className="flex justify-end gap-3">
         <button
@@ -20,7 +41,7 @@ const LogOutModal = ({ isOpen, onClose, onLogOut, buttonText }) => {
           onClick={onLogOut}
           className="bg-purple text-white font-semibold px-4 py-2 rounded shadow-md active:translate-y-px"
         >
-          {buttonText || 'Log Out'}
+          {CMSContent.LogOutButtonText}
         </button>
       </div>
     </Modal>

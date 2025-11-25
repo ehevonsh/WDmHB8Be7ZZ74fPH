@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { getStaticStrapiContent } from "../../lib/strapi";
+import { NoStrapiData } from "../../UI-components";
 
 const Footer = () => {
   const [CMSContent, setCMSContent] = useState(null);
@@ -15,7 +16,7 @@ const Footer = () => {
     };
   }, []);
 
-  if (!CMSContent) return null;
+  if (!CMSContent) return <NoStrapiData />;
   return (
     <footer className="bg-black text-white mt-6 border-t border-white/10">
       <div className="max-w-5xl mx-auto px-5 py-4 text-center">
